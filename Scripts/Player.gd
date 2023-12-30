@@ -3,10 +3,11 @@ extends CharacterBody3D
 
 const WALK_SPEED = 5.0;
 const SPRINT_SPEED = 8.0;
-const JUMP_VELOCITY = 5.5;
+const JUMP_VELOCITY = 6.5;
 const SENSITIVITY = 0.003;
 const BASE_FOV = 75.0;
-const FOV_INCR = 1.5
+const FOV_INCR = 1.3
+const JUMP_TERMINATION_MULTI = 0.6;
 
 # Head bob
 const BOB_FREQ = 2.0;
@@ -14,7 +15,7 @@ const BOB_AMP = 0.09;
 var t_bob = 0.0;
 
 var speed;
-var gravity = 9.8;
+var gravity = 13.0;
 @onready var head = $Head;
 @onready var camera = $Head/Camera3D;
 
@@ -29,7 +30,7 @@ func _process(delta):
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED);
 
 func _unhandled_input(event):
-	if event is InputEventMouse:
+	if event is InputEventMouseMotion:
 		head.rotate_y((event.relative.x * SENSITIVITY) * -1);
 		camera.rotate_x((event.relative.y * SENSITIVITY) * -1);
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60));
@@ -39,6 +40,8 @@ func _physics_process(delta):
 	
 	# Handle gravity
 	if not is_on_floor():
+		if !Input.is_action_pressed("jump"):
+			velocity.y -= gravity * JUMP_TERMINATION_MULTI * delta;
 		velocity.y -= gravity * delta;
 	
 	# Handle Jump.
@@ -65,7 +68,7 @@ func _physics_process(delta):
 			velocity.z = direction.z * speed;
 		else:
 			velocity.x = lerp(velocity.x, direction.x * speed, delta * 5.0);
-		velocity.z = lerp(velocity.z, direction.z * speed, delta * 5.0);
+			velocity.z = lerp(velocity.z, direction.z * speed, delta * 5.0);
 	else:
 		velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0);
 		velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0);
