@@ -8,6 +8,8 @@ const SENSITIVITY = 0.003;
 const BASE_FOV = 75.0;
 const FOV_INCR = 1.3
 const JUMP_TERMINATION_MULTI = 0.6;
+const MAX_UP_ROTATION = 60;
+const MAX_DOWN_ROTATION = -60;
 
 # Head bob
 const BOB_FREQ = 2.0;
@@ -33,7 +35,7 @@ func _unhandled_input(event):
 	if event is InputEventMouseMotion:
 		head.rotate_y((event.relative.x * SENSITIVITY) * -1);
 		camera.rotate_x((event.relative.y * SENSITIVITY) * -1);
-		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60));
+		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(MAX_DOWN_ROTATION), deg_to_rad(MAX_UP_ROTATION));
 
 func _physics_process(delta):
 	var target_fov = BASE_FOV;
